@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de IMC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #2d2d2d;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #404040;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #cccccc;
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            background: #404040;
+            color: #ffffff;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #666666;
+            background: #4a4a4a;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #555555;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            background: #666666;
+        }
+        
+        .resultado {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #3a3a3a;
+            border-radius: 8px;
+            border-left: 4px solid #666666;
+            display: none;
+        }
+        
+        .resultado h3 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+        
+        .resultado p {
+            margin-bottom: 0.5rem;
+            color: #cccccc;
+        }
+        
+        .classificacao {
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        
+        .peso-adequado { background: #d4edda; color: #155724; }
+        .baixo-peso { background: #fff3cd; color: #856404; }
+        .sobrepeso { background: #f8d7da; color: #721c24; }
+        .obesidade { background: #f5c6cb; color: #721c24; }
+        
+        .erro {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .tabela-imc {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #3a3a3a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+            color: #cccccc;
+        }
+        
+        th {
+            background: #555555;
+            color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background: #4a4a4a;
+        }
+        
+        .destaque {
+            background: #2a4f3e;
+            color: #7ed321;
+            font-weight: bold;
+        }
+        
+        .tabela-imc h3 {
+            text-align: center; 
+            margin-bottom: 1rem; 
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de IMC</h1>
+        
+        <form id="imcForm">
+            <div class="form-group">
+                <label for="nome">Nome Completo:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="altura">Altura (em metros):</label>
+                <input type="number" id="altura" name="altura" step="0.01" min="0.5" max="3" placeholder="Ex: 1.75" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="peso">Peso (em kg):</label>
+                <input type="number" id="peso" name="peso" step="0.1" min="10" max="500" placeholder="Ex: 70.5" required>
+            </div>
+            
+            <button type="submit" class="btn">Calcular IMC</button>
+        </form>
+        
+        <div id="erro" class="erro"></div>
+        
+        <div id="resultado" class="resultado">
+            <h3>Resultado do IMC</h3>
+            <p><strong>Nome:</strong> <span id="resultNome"></span></p>
+            <p><strong>Altura:</strong> <span id="resultAltura"></span> m</p>
+            <p><strong>Peso:</strong> <span id="resultPeso"></span> kg</p>
+            <p><strong>IMC:</strong> <span id="resultIMC"></span></p>
+            <div id="classificacao" class="classificacao"></div>
+        </div>
+        
+        <div class="tabela-imc">
+            <h3 style="text-align: center; margin-bottom: 1rem; color: #ffffff;">Tabela de Classificação IMC</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>IMC</th>
+                        <th>Categoria</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Menos de 16</td>
+                        <td>Baixo peso (grau I)</td>
+                    </tr>
+                    <tr>
+                        <td>Entre 16 e 16,99</td>
+                        <td>Baixo peso (grau II)</td>
+                    </tr>
+                    <tr>
+                        <td>Entre 17 e 18,49</td>
+                        <td>Baixo peso (grau III)</td>
+                    </tr>
+                    <tr class="destaque">
+                        <td>Entre 18,50 e 24,99</td>
+                        <td>Peso adequado</td>
+                    </tr>
+                    <tr>
+                        <td>Entre 25 e 29,99</td>
+                        <td>Sobrepeso</td>
+                    </tr>
+                    <tr>
+                        <td>Entre 30 e 34,99</td>
+                        <td>Obesidade (grau I)</td>
+                    </tr>
+                    <tr>
+                        <td>Entre 35 e 39,99</td>
+                        <td>Obesidade (grau II)</td>
+                    </tr>
+                    <tr>
+                        <td>A partir de 40</td>
+                        <td>Obesidade (grau III)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('imcForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch('/calcular-imc', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Limpar erro anterior
+                    document.getElementById('erro').style.display = 'none';
+                    
+                    // Exibir resultado
+                    document.getElementById('resultNome').textContent = result.nome;
+                    document.getElementById('resultAltura').textContent = result.altura;
+                    document.getElementById('resultPeso').textContent = result.peso;
+                    document.getElementById('resultIMC').textContent = result.imc;
+                    
+                    const classificacaoEl = document.getElementById('classificacao');
+                    classificacaoEl.textContent = result.classificacao;
+                    
+                    // Aplicar classe CSS baseada na classificação
+                    classificacaoEl.className = 'classificacao';
+                    if (result.classificacao.includes('Peso adequado')) {
+                        classificacaoEl.classList.add('peso-adequado');
+                    } else if (result.classificacao.includes('Baixo peso')) {
+                        classificacaoEl.classList.add('baixo-peso');
+                    } else if (result.classificacao.includes('Sobrepeso')) {
+                        classificacaoEl.classList.add('sobrepeso');
+                    } else if (result.classificacao.includes('Obesidade')) {
+                        classificacaoEl.classList.add('obesidade');
+                    }
+                    
+                    document.getElementById('resultado').style.display = 'block';
+                } else {
+                    // Exibir erro
+                    document.getElementById('erro').textContent = result.erro;
+                    document.getElementById('erro').style.display = 'block';
+                    document.getElementById('resultado').style.display = 'none';
+                }
+            } catch (error) {
+                document.getElementById('erro').textContent = 'Erro de conexão com o servidor';
+                document.getElementById('erro').style.display = 'block';
+                document.getElementById('resultado').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
